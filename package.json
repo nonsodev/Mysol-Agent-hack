@@ -1,0 +1,57 @@
+{
+  "name": "agent-challenge",
+  "version": "1.0.0",
+  "main": ".mastra/output/index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:agent": "nosana job post --file ./nos_job_def/nosana_mastra.json --market nvidia-3090 --timeout 30",
+    "deploy:qwen": "nosana job post --file ./nos_job_def/qwen_nos_jb.json --market nvidia-3090 --timeout 30",
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start",
+    "test:workflows": "npx tsx src/test-workflows.ts",
+    "get:paj-token": "npx tsx src/tools/get-paj-token.ts",
+    "lint": "biome lint ./src",
+    "format": "biome format ./src/** --write",
+    "check": "biome check ./src",
+    "backend:dev": "npx tsx backend/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^1.2.22",
+    "@ai-sdk/openai": "^1.3.22",
+    "@libsql/client": "^0.5.6",
+    "@mastra/core": "0.10.15",
+    "@mastra/libsql": "0.10.2",
+    "@mastra/loggers": "0.10.2",
+    "@mastra/memory": "0.10.3",
+    "@mayanfinance/swap-sdk": "^10.9.0",
+    "@solana/web3.js": "^1.98.2",
+    "ai": "^4.3.17",
+    "axios": "^1.10.0",
+    "bs58": "^6.0.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "paj_ramp": "^1.2.3",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.5.0",
+    "openai": "^5.8.2",
+    "pump-fun-token-launcher-nokitha": "^1.0.1",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.4",
+    "@types/crypto-js": "^4.2.2",
+    "@types/node-telegram-bot-api": "^0.64.7",
+    "@nosana/cli": "^1.0.52",
+    "@types/node": "^24.0.3",
+    "mastra": "0.10.15",
+    "typescript": "^5.8.3"
+  }
+}
