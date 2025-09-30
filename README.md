@@ -96,6 +96,15 @@ npm run lint          # Lint
 npm run format        # Format
 ```
 
+## Coming soon
+
+- Wider on-ramp/off-ramp currency and region coverage
+- Smarter agentic trading: multi-step planning, guardrails, and auto-retries
+- Cross-chain expansions and more swap routes
+- Portfolio alerts, price/risk notifications, and scheduled digests
+- Richer research views in Mastra (charts, comparables, historical context)
+- Multi-wallet UX improvements and team/collab primitives
+
 ## License
 
 ISC

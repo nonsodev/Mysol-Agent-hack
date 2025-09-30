@@ -85,11 +85,7 @@ export class TelegramBotRunner {
           '- swap 0.05 SOL to USDC',
           '- swap 10 USDC to BONK',
           '- onramp 2000',
-          '',
-          'Offramp:',
-          '- /banks (list banks)',
-          '- /addbank <bank_id> <account>',
-          '- /offramp <amount> <bank_account_id>',
+          '- offramp 10  (natural language)',
         ].join('\n'));
       } catch (e: any) {
         await this.bot.sendMessage(chatId, `Failed to set mode: ${e?.message || e}`);
@@ -490,15 +486,34 @@ export class TelegramBotRunner {
       if (mode === 'wallet') {
         // Offramp natural language wizard
         // Start wizard when user mentions offramp/withdraw in natural language
+        // Fast-path: "offramp <amount>" or "withdraw <amount>"
+        const offrampWithAmount = textBody.match(/^\s*(offramp|withdraw)\s+(\d+(?:\.\d+)?)\s*$/i);
         if (/(^|\b)(offramp|withdraw)(\b|$)/i.test(textBody)) {
           try {
-            await this.userService.upsertSession(userId, {
-              ...sessionData,
-              pending: {
-                type: 'offramp_wizard',
-                payload: { step: 'amount' }
+            if (offrampWithAmount) {
+              const amt = Number(offrampWithAmount[2]);
+              if (!amt || amt <= 0) {
+                await this.bot.sendMessage(chatId, 'Please provide a valid numeric amount (e.g., 10).');
+                return;
               }
-            });
+              const pajToken = process.env.PAJ_TOKEN;
+              if (pajToken) {
+                try {
+                  const accounts = await this.offrampService.getUserBankAccounts(pajToken);
+                  if (accounts && accounts.length > 0) {
+                    const opts = accounts.map(a => ({ id: a.id, accountName: a.accountName, accountNumber: a.accountNumber, bank: a.bank }));
+                    const lines = opts.slice(0, 10).map((a, i) => `${i + 1}. ${a.accountName} — ${a.accountNumber} (${a.bank}) — ID: ${a.id}`);
+                    await this.userService.upsertSession(userId, { ...sessionData, pending: { type: 'offramp_wizard', payload: { step: 'account_pick', amount: amt, options: opts.slice(0, 10) } } });
+                    await this.bot.sendMessage(chatId, `Select a bank account by number (1-${Math.min(10, opts.length)}):\n\n${lines.join('\n')}`);
+                    return;
+                  }
+                } catch {}
+              }
+              await this.userService.upsertSession(userId, { ...sessionData, pending: { type: 'offramp_wizard', payload: { step: 'bank_search', amount: amt } } });
+              await this.bot.sendMessage(chatId, 'No saved bank accounts found. Which bank? Reply with a bank name or country code (e.g., "STERLING" or "NG").');
+              return;
+            }
+            await this.userService.upsertSession(userId, { ...sessionData, pending: { type: 'offramp_wizard', payload: { step: 'amount' } } });
             await this.bot.sendMessage(chatId, 'How much do you want to offramp? (amount in USDC, e.g., 10)');
           } catch (e: any) {
             await this.bot.sendMessage(chatId, `Unable to start offramp wizard: ${e?.message || String(e)}`);
