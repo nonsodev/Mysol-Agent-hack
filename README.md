@@ -1,4 +1,4 @@
-# MySol Agent — Your Telegram-native Solana Copilot
+# MySol Agent — Your multi-platform Solana Copilot
 
 Turn Telegram into your command center for Solana. Create and manage wallets, swap tokens, on/off-ramp, and run rich token research — all through a friendly agent that understands natural language.
 
